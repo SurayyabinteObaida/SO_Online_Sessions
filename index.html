@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBMS Mid Prep — Student</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --border: #2a2d3a;
+  --accent: #4f8ef7;
+  --accent2: #38d9a9;
+  --warn: #f59e0b;
+  --danger: #f87171;
+  --text: #e8eaf0;
+  --muted: #6b7280;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+
+.grid-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.container { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+.header { margin-bottom: 2rem; }
+.tag { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+h1 { font-size: 26px; font-weight: 600; color: var(--text); line-height: 1.2; }
+.subtitle { font-size: 14px; color: var(--muted); margin-top: 6px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.card-label { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+
+.join-form { display: flex; flex-direction: column; gap: 12px; }
+.field-row { display: flex; flex-direction: column; gap: 6px; }
+.field-row label { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+.field-row input, .field-row select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: var(--sans);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field-row input:focus, .field-row select:focus { border-color: var(--accent); }
+.field-row select option { background: var(--surface); }
+
+.btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn:hover { opacity: 0.9; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn-success { background: var(--accent2); color: #0f1117; }
+
+.status-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 1rem;
+}
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent2); flex-shrink: 0; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.status-text { font-size: 13px; color: var(--muted); }
+.status-name { color: var(--text); font-weight: 500; }
+
+.topic-display {
+  background: linear-gradient(135deg, #1a2744, #1a2732);
+  border: 1px solid #2a4480;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+.topic-label { font-family: var(--mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.topic-title { font-size: 18px; font-weight: 600; color: var(--text); }
+.team-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+.section-title { font-size: 15px; font-weight: 500; margin-bottom: 14px; color: var(--text); }
+
+.mcq-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+.mcq-item.answered { border-color: var(--accent2); }
+.mcq-q { font-size: 14px; margin-bottom: 10px; line-height: 1.5; color: var(--text); }
+.mcq-options { display: flex; flex-direction: column; gap: 6px; }
+.option-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--sans);
+  transition: all 0.15s;
+}
+.option-btn:hover { border-color: var(--accent); color: var(--accent); }
+.option-btn.selected { border-color: var(--accent); background: rgba(79,142,247,0.1); color: var(--accent); }
+.option-btn.correct { border-color: var(--accent2); background: rgba(56,217,169,0.1); color: var(--accent2); }
+.option-btn.wrong { border-color: var(--danger); background: rgba(248,113,113,0.1); color: var(--danger); }
+
+.score-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(56,217,169,0.1); border: 1px solid var(--accent2);
+  color: var(--accent2); border-radius: 6px; padding: 4px 10px;
+  font-family: var(--mono); font-size: 13px;
+}
+
+textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: var(--sans);
+  width: 100%;
+  resize: vertical;
+  min-height: 120px;
+  outline: none;
+  line-height: 1.6;
+  transition: border-color 0.2s;
+}
+textarea:focus { border-color: var(--accent); }
+
+.submitted-banner {
+  background: rgba(56,217,169,0.08);
+  border: 1px solid var(--accent2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; color: var(--accent2);
+  margin-top: 10px;
+}
+
+.hidden { display: none !important; }
+.flex { display: flex; gap: 10px; }
+.mt { margin-top: 10px; }
+
+#loading { text-align: center; padding: 3rem; color: var(--muted); font-family: var(--mono); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="container">
+
+  <div id="loading">connecting to session...</div>
+
+  <!-- JOIN SCREEN -->
+  <div id="screen-join" class="hidden">
+    <div class="header">
+      <div class="tag">DBMS — Mid Exam Prep</div>
+      <h1>Join your study session</h1>
+      <div class="subtitle">Select your name to connect to your team's workspace</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Your details</div>
+      <div class="join-form">
+        <div class="field-row">
+          <label>Your name</label>
+          <select id="student-select">
+            <option value="">— select your name —</option>
+          </select>
+        </div>
+        <button class="btn" onclick="joinSession()">Join session →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN WORKSPACE -->
+  <div id="screen-main" class="hidden">
+    <div class="status-bar">
+      <div class="pulse"></div>
+      <div class="status-text">Logged in as <span class="status-name" id="display-name">—</span></div>
+      <div style="margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted)" id="timer-display">—</div>
+    </div>
+
+    <div class="topic-display">
+      <div class="topic-label">Your team's topic</div>
+      <div class="topic-title" id="my-topic">—</div>
+      <div class="team-label" id="my-team">—</div>
+    </div>
+
+    <!-- MCQ Section -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="section-title" style="margin:0">Topic MCQs</div>
+        <div class="score-badge" id="score-display">0 / 5</div>
+      </div>
+      <div id="mcq-container"></div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="card">
+      <div class="section-title">Write a summary</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px">In 5–8 sentences, explain the key concepts of your topic. Imagine you're explaining to a classmate who missed class.</div>
+      <textarea id="summary-text" placeholder="Start writing your summary here..." oninput="autosaveSummary()"></textarea>
+      <div class="flex mt">
+        <button class="btn btn-success" onclick="submitSummary()" id="submit-btn">Submit summary</button>
+        <button class="btn btn-outline" onclick="saveDraft()">Save draft</button>
+      </div>
+      <div id="submitted-banner" class="submitted-banner hidden">
+        ✓ Summary submitted successfully. You can still edit and resubmit.
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION NOT STARTED -->
+  <div id="screen-wait" class="hidden">
+    <div class="header">
+      <div class="tag">DBMS — Mid Exam Prep</div>
+      <h1>Session not started yet</h1>
+      <div class="subtitle">Your instructor hasn't started the session. Please wait and refresh in a moment.</div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── PASTE YOUR FIREBASE CONFIG BELOW ──
+const firebaseConfig = {
+  apiKey: "AIzaSyBgYtUIOeWntYEgEcAH93PBHGjEfrrZdTg",
+  authDomain: "so-online-classes.firebaseapp.com",
+  projectId: "so-online-classes",
+  storageBucket: "so-online-classes.firebasestorage.app",
+  messagingSenderId: "763914223805",
+  appId: "1:763914223805:web:24c5492eb64390331cb7d4"
+};
+// ─────────────────────────────────────
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let myName = null;
+let myTeam = null;
+let myTopic = null;
+let heartbeatInterval = null;
+let sessionData = null;
+
+const MCQ_BANK = {};
+
+// Topic MCQs
+MCQ_BANK["Introduction to Database Systems"] = [
+  { q: "What is a database?", opts: ["A collection of unrelated files", "An organized collection of structured data", "A programming language", "A type of operating system"], ans: 1 },
+  { q: "Which of the following best describes a DBMS?", opts: ["Hardware for storing data", "Software for managing databases", "A network protocol", "A file compression tool"], ans: 1 },
+  { q: "Data redundancy in traditional systems leads to:", opts: ["Faster queries", "Inconsistency and wasted storage", "Better security", "Improved performance"], ans: 1 },
+  { q: "Which is NOT a function of a DBMS?", opts: ["Data storage", "Data retrieval", "Compiling source code", "Data security"], ans: 2 },
+  { q: "A database system consists of:", opts: ["Only hardware", "Only software", "Hardware, software, data, users, and procedures", "Only data and users"], ans: 2 }
+];
+MCQ_BANK["Issues in Traditional File Storage Systems"] = [
+  { q: "Data redundancy in file systems means:", opts: ["Data is encrypted", "Same data stored in multiple places", "Data is compressed", "Data is indexed"], ans: 1 },
+  { q: "Which issue arises when the same data is stored differently in different files?", opts: ["Data security", "Data inconsistency", "Data integrity", "Data availability"], ans: 1 },
+  { q: "Program-data dependence in file systems means:", opts: ["Programs are independent of data", "Changing data format requires changing programs", "Data can be shared freely", "Programs run faster"], ans: 1 },
+  { q: "Concurrent access problems in file systems occur when:", opts: ["Only one user accesses data", "Multiple users access same data simultaneously", "Data is read-only", "Data is encrypted"], ans: 1 },
+  { q: "Which is NOT an issue in traditional file storage?", opts: ["Data redundancy", "Data inconsistency", "Data normalization", "Limited data sharing"], ans: 2 }
+];
+MCQ_BANK["Advantages of DBMS"] = [
+  { q: "Which advantage of DBMS reduces duplicate data?", opts: ["Data security", "Controlled redundancy", "Faster processing", "Simpler structure"], ans: 1 },
+  { q: "Data independence in DBMS means:", opts: ["Data has no relationships", "Applications are unaffected by data structure changes", "Data cannot be modified", "Users cannot access data"], ans: 1 },
+  { q: "Concurrent access control in DBMS ensures:", opts: ["Only admins can access data", "Multiple users can safely access data simultaneously", "Data is always locked", "Queries always run sequentially"], ans: 1 },
+  { q: "Which DBMS advantage helps recover data after a crash?", opts: ["Data sharing", "Backup and recovery", "Normalization", "Indexing"], ans: 1 },
+  { q: "Enforcing data integrity constraints is a responsibility of:", opts: ["Operating system", "File system", "DBMS", "Network layer"], ans: 2 }
+];
+MCQ_BANK["Evolution of DBMS"] = [
+  { q: "Which was the first generation of database models?", opts: ["Relational", "Object-oriented", "Hierarchical and Network", "NoSQL"], ans: 2 },
+  { q: "The relational model was proposed by:", opts: ["Charles Bachman", "Edgar Codd", "James Martin", "Peter Chen"], ans: 1 },
+  { q: "In a hierarchical model, records are organized as:", opts: ["A graph", "A tree with parent-child relationships", "A flat table", "A network"], ans: 1 },
+  { q: "Which model allows many-to-many relationships natively?", opts: ["Hierarchical", "Relational", "Network", "Object-oriented"], ans: 2 },
+  { q: "NoSQL databases are primarily used for:", opts: ["Highly structured relational data", "Unstructured or semi-structured big data", "Only numeric data", "Small local files"], ans: 1 }
+];
+MCQ_BANK["SDLC Approach for DBMS"] = [
+  { q: "Which is the first phase of SDLC?", opts: ["Design", "Implementation", "Planning", "Testing"], ans: 2 },
+  { q: "Requirements analysis in SDLC involves:", opts: ["Writing code", "Understanding user needs and system requirements", "Deploying the system", "Testing the database"], ans: 1 },
+  { q: "The design phase of SDLC for a database includes:", opts: ["User training", "Conceptual, logical, and physical design", "Bug fixing", "Maintenance"], ans: 1 },
+  { q: "Which phase comes after implementation in SDLC?", opts: ["Planning", "Design", "Testing and maintenance", "Requirements analysis"], ans: 2 },
+  { q: "Maintenance phase in SDLC includes:", opts: ["Initial planning", "Ongoing updates and performance tuning", "First-time installation", "User interviews"], ans: 1 }
+];
+MCQ_BANK["Rapid Prototyping for DBMS"] = [
+  { q: "Rapid prototyping in DBMS development helps to:", opts: ["Eliminate the need for testing", "Quickly validate user requirements through working models", "Skip the design phase", "Reduce data security"], ans: 1 },
+  { q: "A prototype in software development is:", opts: ["The final product", "An early working model to demonstrate functionality", "A test case", "A user manual"], ans: 1 },
+  { q: "Which is an advantage of rapid prototyping?", opts: ["More documentation", "Faster feedback from users", "Higher initial cost", "Longer development cycles"], ans: 1 },
+  { q: "Rapid prototyping is most useful when:", opts: ["Requirements are fully clear", "Requirements are vague or likely to change", "The system is already built", "No users are available"], ans: 1 },
+  { q: "A throwaway prototype is one that:", opts: ["Becomes the final system", "Is discarded after requirements are clarified", "Is used for production", "Is never shown to users"], ans: 1 }
+];
+MCQ_BANK["ANSI SPARC Model and Data Independence"] = [
+  { q: "How many levels does the ANSI/SPARC architecture have?", opts: ["2", "3", "4", "5"], ans: 1 },
+  { q: "The external level in ANSI/SPARC represents:", opts: ["Physical storage", "Overall logical structure", "Individual user views", "Network connections"], ans: 2 },
+  { q: "Logical data independence means:", opts: ["Physical storage can change without affecting logical schema", "Logical schema can change without affecting external views", "Users cannot see the schema", "Data is always encrypted"], ans: 1 },
+  { q: "Physical data independence means:", opts: ["Physical storage can change without affecting logical schema", "Logical schema can change without affecting users", "Data cannot be deleted", "Users control physical storage"], ans: 0 },
+  { q: "The internal schema describes:", opts: ["User views", "Conceptual data model", "Physical storage structure", "Network topology"], ans: 2 }
+];
+MCQ_BANK["Schema and Schema Modelling"] = [
+  { q: "A schema is best described as:", opts: ["Actual data stored in the database", "The structure or blueprint of the database", "A query language", "A type of index"], ans: 1 },
+  { q: "Instance refers to:", opts: ["The schema of a database", "The data stored in the database at a particular moment", "A database user", "A stored procedure"], ans: 1 },
+  { q: "Which schema describes how data is physically stored?", opts: ["External schema", "Conceptual schema", "Internal schema", "User schema"], ans: 2 },
+  { q: "Schema evolution refers to:", opts: ["Deleting the schema", "Changes made to the schema over time", "Copying a schema", "Encrypting schema"], ans: 1 },
+  { q: "A subschema is:", opts: ["A backup schema", "A portion of the conceptual schema viewed by a user", "A duplicate schema", "An encrypted schema"], ans: 1 }
+];
+MCQ_BANK["Introduction to ER Modelling"] = [
+  { q: "ER stands for:", opts: ["Entity Relationship", "Extended Record", "Element Reference", "Event Record"], ans: 0 },
+  { q: "ER modelling is primarily used in which phase?", opts: ["Physical design", "Conceptual design", "Implementation", "Testing"], ans: 1 },
+  { q: "Who introduced the ER model?", opts: ["Edgar Codd", "Peter Chen", "E.F. Codd", "James Martin"], ans: 1 },
+  { q: "An ER diagram is used to:", opts: ["Write SQL queries", "Visually represent the data model", "Store data physically", "Compile programs"], ans: 1 },
+  { q: "The main components of an ER model are:", opts: ["Tables, rows, columns", "Entities, attributes, relationships", "Functions, procedures, triggers", "Schemas, instances, views"], ans: 1 }
+];
+MCQ_BANK["Constructs of ER"] = [
+  { q: "In an ER diagram, a rectangle represents:", opts: ["An attribute", "An entity", "A relationship", "A constraint"], ans: 1 },
+  { q: "A diamond shape in an ER diagram represents:", opts: ["An entity", "An attribute", "A relationship", "A key"], ans: 2 },
+  { q: "An ellipse in an ER diagram represents:", opts: ["A relationship", "An entity", "An attribute", "A constraint"], ans: 2 },
+  { q: "Double rectangles in ER diagrams represent:", opts: ["Strong entities", "Weak entities", "Relationships", "Attributes"], ans: 1 },
+  { q: "Which construct shows how entities are connected?", opts: ["Attribute", "Entity", "Relationship", "Key"], ans: 2 }
+];
+MCQ_BANK["Attributes and Their Types"] = [
+  { q: "A composite attribute is one that:", opts: ["Has a single value", "Can be broken into smaller sub-attributes", "Has no value", "Is derived from other attributes"], ans: 1 },
+  { q: "A multi-valued attribute:", opts: ["Has exactly one value", "Can have multiple values", "Is always a key", "Cannot be stored in a database"], ans: 1 },
+  { q: "A derived attribute:", opts: ["Cannot be calculated", "Is computed from other stored attributes", "Has multiple values", "Is the primary key"], ans: 1 },
+  { q: "Which symbol represents a derived attribute in an ER diagram?", opts: ["Rectangle", "Diamond", "Dashed ellipse", "Double ellipse"], ans: 2 },
+  { q: "A key attribute uniquely identifies:", opts: ["A relationship", "An entity instance", "A database", "A foreign key"], ans: 1 }
+];
+MCQ_BANK["Entity and Entity Types"] = [
+  { q: "An entity type defines:", opts: ["A specific record", "A collection of entities with same attributes", "A database table column", "A relationship"], ans: 1 },
+  { q: "An entity instance is:", opts: ["A category of entities", "A specific occurrence of an entity type", "A relationship type", "An attribute"], ans: 1 },
+  { q: "A weak entity:", opts: ["Has its own primary key", "Depends on another entity for identification", "Has no attributes", "Cannot participate in relationships"], ans: 1 },
+  { q: "A strong entity:", opts: ["Depends on another entity", "Has its own unique identifier", "Has no relationships", "Has multi-valued attributes only"], ans: 1 },
+  { q: "Which notation is used for weak entities in ER diagrams?", opts: ["Single rectangle", "Double rectangle", "Diamond", "Dashed rectangle"], ans: 1 }
+];
+MCQ_BANK["Relationships"] = [
+  { q: "A relationship in an ER model represents:", opts: ["An attribute", "An association between entities", "A table column", "A data type"], ans: 1 },
+  { q: "A recursive relationship involves:", opts: ["Two different entity types", "An entity type related to itself", "Three or more entities", "No entities"], ans: 1 },
+  { q: "Which of the following is a valid relationship type?", opts: ["Binary", "Tertiary", "Both binary and ternary", "Neither"], ans: 2 },
+  { q: "Participation constraint specifies:", opts: ["Whether an entity must participate in a relationship", "The data type of an attribute", "The number of tables", "The query language"], ans: 0 },
+  { q: "Total participation means:", opts: ["Optional participation", "Every entity must participate in the relationship", "Only some entities participate", "No entity participates"], ans: 1 }
+];
+MCQ_BANK["Associative Entities"] = [
+  { q: "An associative entity is used to:", opts: ["Remove all relationships", "Resolve a many-to-many relationship with attributes", "Create weak entities", "Merge two tables"], ans: 1 },
+  { q: "An associative entity is also called:", opts: ["Weak entity", "Gerund or intersection entity", "Strong entity", "Derived entity"], ans: 1 },
+  { q: "When should you convert a relationship to an associative entity?", opts: ["When it has no attributes", "When it has its own attributes", "When it is one-to-one", "When it involves weak entities"], ans: 1 },
+  { q: "An associative entity is represented in ER as:", opts: ["A diamond inside a rectangle", "An ellipse", "A double diamond", "A dashed rectangle"], ans: 0 },
+  { q: "The primary key of an associative entity usually consists of:", opts: ["One attribute only", "Keys of the participating entities", "A derived attribute", "No key"], ans: 1 }
+];
+MCQ_BANK["Degree of Relationships"] = [
+  { q: "A unary relationship involves:", opts: ["Two entity types", "One entity type", "Three entity types", "No entity types"], ans: 1 },
+  { q: "A binary relationship involves:", opts: ["One entity", "Two entities", "Three entities", "Four entities"], ans: 1 },
+  { q: "A ternary relationship involves:", opts: ["One entity", "Two entities", "Three entities", "Four entities"], ans: 2 },
+  { q: "The degree of a relationship is determined by:", opts: ["Number of attributes", "Number of entity types participating", "Number of tuples", "Number of keys"], ans: 1 },
+  { q: "Which degree is most common in ER modelling?", opts: ["Unary", "Binary", "Ternary", "Quaternary"], ans: 1 }
+];
+MCQ_BANK["Cardinalities in Relationships"] = [
+  { q: "One-to-many cardinality means:", opts: ["One entity relates to exactly one", "One entity relates to many; many relate to one", "Many relate to many", "No relationship exists"], ans: 1 },
+  { q: "Many-to-many cardinality is typically resolved by:", opts: ["Adding a foreign key", "Creating an associative entity", "Deleting one entity", "Merging tables"], ans: 1 },
+  { q: "In a one-to-one relationship:", opts: ["One entity maps to many", "Each entity instance maps to exactly one instance of the other", "Many entities map to one", "No mapping exists"], ans: 1 },
+  { q: "Cardinality constraints help in:", opts: ["Defining data types", "Defining how many instances can be related", "Setting passwords", "Creating indexes"], ans: 1 },
+  { q: "Which cardinality is shown by a crow's foot notation on one side?", opts: ["One", "Many", "Zero", "Optional"], ans: 1 }
+];
+MCQ_BANK["Enhanced ER with Supertype Subtype Modelling"] = [
+  { q: "A supertype entity:", opts: ["Is a specialization", "Is a generalization of subtypes", "Has no attributes", "Cannot have relationships"], ans: 1 },
+  { q: "A subtype entity:", opts: ["Generalizes other entities", "Inherits attributes from its supertype", "Has no key", "Is always weak"], ans: 1 },
+  { q: "Generalization means:", opts: ["Breaking an entity into subtypes", "Combining common attributes of subtypes into a supertype", "Removing attributes", "Duplicating entities"], ans: 1 },
+  { q: "Specialization means:", opts: ["Combining entities", "Defining subtypes with specific attributes", "Removing relationships", "Adding foreign keys"], ans: 1 },
+  { q: "Which notation represents supertype-subtype in EER?", opts: ["Diamond", "Circle with lines to subtypes", "Rectangle with ellipse", "Double diamond"], ans: 1 }
+];
+MCQ_BANK["Completeness, Dis-jointness, Subtype Discriminators"] = [
+  { q: "Total completeness constraint means:", opts: ["Every supertype instance must belong to at least one subtype", "Subtypes can have no instances", "Supertypes have no attributes", "Entities are unrelated"], ans: 0 },
+  { q: "Partial completeness constraint means:", opts: ["Every instance must be in a subtype", "A supertype instance may not belong to any subtype", "Subtypes overlap", "Subtypes are disjoint"], ans: 1 },
+  { q: "Disjoint constraint means:", opts: ["An instance can belong to multiple subtypes", "An instance can belong to at most one subtype", "Subtypes share all attributes", "Supertypes have no subtypes"], ans: 1 },
+  { q: "Overlapping constraint means:", opts: ["An instance belongs to exactly one subtype", "An instance can belong to multiple subtypes", "Subtypes are identical", "No instance exists"], ans: 1 },
+  { q: "A subtype discriminator is:", opts: ["A foreign key", "An attribute that determines which subtype an instance belongs to", "A primary key of a subtype", "A relationship type"], ans: 1 }
+];
+MCQ_BANK["Relational Keys"] = [
+  { q: "A primary key:", opts: ["Can be NULL", "Uniquely identifies each tuple and cannot be NULL", "Can be duplicated", "Is always a foreign key"], ans: 1 },
+  { q: "A foreign key:", opts: ["Uniquely identifies tuples in the same table", "References a primary key in another table", "Cannot be NULL", "Is always unique"], ans: 1 },
+  { q: "A candidate key:", opts: ["Is always the primary key", "Is any attribute that could serve as a primary key", "Is always a composite key", "Has no constraints"], ans: 1 },
+  { q: "A composite key consists of:", opts: ["A single attribute", "Two or more attributes combined to uniquely identify tuples", "Only foreign keys", "Only derived attributes"], ans: 1 },
+  { q: "A surrogate key is:", opts: ["A natural key", "A system-generated artificial key with no business meaning", "A foreign key", "A composite key"], ans: 1 }
+];
+MCQ_BANK["Relational Integrity"] = [
+  { q: "Entity integrity states that:", opts: ["Foreign keys can be NULL", "Primary key values must be unique and NOT NULL", "All attributes must have values", "Tuples cannot be deleted"], ans: 1 },
+  { q: "Referential integrity states that:", opts: ["Primary keys can be NULL", "A foreign key must match an existing primary key or be NULL", "Tables cannot have foreign keys", "All foreign keys must be NULL"], ans: 1 },
+  { q: "Domain integrity ensures:", opts: ["Primary keys are unique", "Attribute values fall within a defined domain or set", "Foreign keys match primary keys", "Tables have no null values"], ans: 1 },
+  { q: "Which constraint prevents a foreign key from referencing a non-existent primary key?", opts: ["Domain integrity", "Entity integrity", "Referential integrity", "User-defined integrity"], ans: 2 },
+  { q: "What happens when referential integrity is violated?", opts: ["Data is automatically fixed", "The DBMS rejects the operation", "NULL values are inserted", "The table is dropped"], ans: 1 }
+];
+MCQ_BANK["Relational Model"] = [
+  { q: "In the relational model, data is organized in:", opts: ["Trees", "Graphs", "Two-dimensional tables (relations)", "Linked lists"], ans: 2 },
+  { q: "A tuple in a relational table is:", opts: ["A column", "A row/record", "A key", "A constraint"], ans: 1 },
+  { q: "An attribute in a relational table is:", opts: ["A row", "A column", "A table", "A relationship"], ans: 1 },
+  { q: "The degree of a relation is:", opts: ["Number of tuples", "Number of attributes", "Number of tables", "Number of keys"], ans: 1 },
+  { q: "The cardinality of a relation is:", opts: ["Number of attributes", "Number of tuples/rows", "Number of keys", "Number of schemas"], ans: 1 }
+];
+MCQ_BANK["Transforming ER to Relational Model"] = [
+  { q: "A strong entity type maps to:", opts: ["A view", "A relation (table) with all its attributes", "A foreign key only", "An index"], ans: 1 },
+  { q: "A many-to-many relationship is mapped by:", opts: ["Merging the two tables", "Creating a new relation with foreign keys from both entities", "Adding a column to one table", "Deleting one entity"], ans: 1 },
+  { q: "A multi-valued attribute is mapped by:", opts: ["Adding it as a column", "Creating a separate relation with the entity's key", "Ignoring it", "Making it a primary key"], ans: 1 },
+  { q: "A weak entity maps to:", opts: ["A table with no key", "A table including its partial key and the owner's primary key as foreign key", "A view", "An index"], ans: 1 },
+  { q: "A one-to-many relationship is typically mapped by:", opts: ["Creating a new table", "Adding foreign key on the many side", "Merging the two entities", "Creating an associative entity"], ans: 1 }
+];
+
+// Normalize topic name for MCQ lookup
+function getMCQs(topic) {
+  for (const key of Object.keys(MCQ_BANK)) {
+    if (topic.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(topic.toLowerCase().split(' ').slice(0,3).join(' '))) {
+      return MCQ_BANK[key];
+    }
+  }
+  // Try partial match
+  const topicWords = topic.toLowerCase().split(' ');
+  for (const key of Object.keys(MCQ_BANK)) {
+    const keyWords = key.toLowerCase().split(' ');
+    const matches = topicWords.filter(w => w.length > 3 && keyWords.some(kw => kw.includes(w) || w.includes(kw)));
+    if (matches.length >= 2) return MCQ_BANK[key];
+  }
+  return MCQ_BANK["Introduction to Database Systems"];
+}
+
+let mcqs = [];
+let answers = {};
+let submitted = false;
+
+async function init() {
+  const sessionDoc = await getDoc(doc(db, 'session', 'config'));
+  if (!sessionDoc.exists() || !sessionDoc.data().active) {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('screen-wait').classList.remove('hidden');
+    return;
+  }
+  sessionData = sessionDoc.data();
+  populateStudentList();
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('screen-join').classList.remove('hidden');
+}
+
+function populateStudentList() {
+  const sel = document.getElementById('student-select');
+  const allStudents = sessionData.teams.flatMap(t => t.members.map(m => ({ name: m, team: t.name, topic: t.topic })));
+  allStudents.sort((a,b) => a.name.localeCompare(b.name));
+  allStudents.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.name;
+    opt.textContent = s.name;
+    sel.appendChild(opt);
+  });
+}
+
+window.joinSession = async function() {
+  const sel = document.getElementById('student-select');
+  const name = sel.value;
+  if (!name) return;
+  myName = name;
+  const team = sessionData.teams.find(t => t.members.includes(name));
+  myTeam = team.name;
+  myTopic = team.topic;
+
+  document.getElementById('display-name').textContent = myName;
+  document.getElementById('my-topic').textContent = myTopic;
+  document.getElementById('my-team').textContent = myTeam + ' · ' + team.members.join(', ');
+
+  mcqs = getMCQs(myTopic);
+  renderMCQs();
+  startHeartbeat();
+  loadExisting();
+
+  document.getElementById('screen-join').classList.add('hidden');
+  document.getElementById('screen-main').classList.remove('hidden');
+
+  // Timer
+  if (sessionData.startTime) {
+    const elapsed = Math.floor((Date.now() - sessionData.startTime) / 1000);
+    const left = Math.max(0, 40 * 60 - elapsed);
+    updateTimerDisplay(left);
+    const interval = setInterval(() => {
+      const e = Math.floor((Date.now() - sessionData.startTime) / 1000);
+      const l = Math.max(0, 40 * 60 - e);
+      updateTimerDisplay(l);
+      if (l === 0) clearInterval(interval);
+    }, 1000);
+  }
+}
+
+function updateTimerDisplay(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  document.getElementById('timer-display').textContent = `${m}:${s.toString().padStart(2,'0')} left`;
+}
+
+function renderMCQs() {
+  const container = document.getElementById('mcq-container');
+  container.innerHTML = '';
+  mcqs.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'mcq-item';
+    div.id = `mcq-${i}`;
+    div.innerHTML = `<div class="mcq-q">${i+1}. ${q.q}</div>
+      <div class="mcq-options">${q.opts.map((o,j) =>
+        `<button class="option-btn" onclick="selectAnswer(${i},${j})">${o}</button>`
+      ).join('')}</div>`;
+    container.appendChild(div);
+  });
+}
+
+window.selectAnswer = async function(qi, oi) {
+  if (answers[qi] !== undefined) return;
+  answers[qi] = oi;
+  const item = document.getElementById(`mcq-${qi}`);
+  item.classList.add('answered');
+  const btns = item.querySelectorAll('.option-btn');
+  btns[oi].classList.add(oi === mcqs[qi].ans ? 'correct' : 'wrong');
+  if (oi !== mcqs[qi].ans) btns[mcqs[qi].ans].classList.add('correct');
+  btns.forEach(b => b.disabled = true);
+  const score = Object.values(answers).filter((a, i) => a === mcqs[i]?.ans).length;
+  document.getElementById('score-display').textContent = `${score} / ${mcqs.length}`;
+  await updateProgress();
+}
+
+async function startHeartbeat() {
+  await sendHeartbeat();
+  heartbeatInterval = setInterval(sendHeartbeat, 30000);
+}
+
+async function sendHeartbeat() {
+  if (!myName || !myTeam) return;
+  const key = myName.replace(/\s+/g, '_');
+  await setDoc(doc(db, 'presence', key), {
+    name: myName,
+    team: myTeam,
+    topic: myTopic,
+    lastSeen: Date.now(),
+    mcqScore: Object.values(answers).filter((a,i) => a === mcqs[i]?.ans).length,
+    mcqAnswered: Object.keys(answers).length,
+    summarySubmitted: submitted
+  }, { merge: true });
+}
+
+async function updateProgress() {
+  await sendHeartbeat();
+}
+
+async function loadExisting() {
+  const key = myName.replace(/\s+/g, '_');
+  const snap = await getDoc(doc(db, 'presence', key));
+  if (snap.exists()) {
+    const data = snap.data();
+    if (data.summaryText) {
+      document.getElementById('summary-text').value = data.summaryText;
+    }
+    if (data.summarySubmitted) {
+      submitted = true;
+      document.getElementById('submitted-banner').classList.remove('hidden');
+    }
+  }
+}
+
+let saveTimeout;
+window.autosaveSummary = function() {
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(saveDraft, 3000);
+}
+
+window.saveDraft = async function() {
+  if (!myName) return;
+  const key = myName.replace(/\s+/g, '_');
+  await setDoc(doc(db, 'presence', key), { summaryText: document.getElementById('summary-text').value }, { merge: true });
+}
+
+window.submitSummary = async function() {
+  const text = document.getElementById('summary-text').value.trim();
+  if (text.length < 50) { alert('Please write at least a few sentences before submitting.'); return; }
+  const key = myName.replace(/\s+/g, '_');
+  await setDoc(doc(db, 'presence', key), {
+    summaryText: text,
+    summarySubmitted: true,
+    submittedAt: Date.now()
+  }, { merge: true });
+  submitted = true;
+  document.getElementById('submitted-banner').classList.remove('hidden');
+}
+
+init();
+</script>
+</body>
+</html>
