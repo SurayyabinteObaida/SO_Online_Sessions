@@ -3,225 +3,254 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DBMS Monitor — Teacher Dashboard</title>
+<title>SO Online Sessions — Monitor</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0a0c10;
-  --surface: #13151f;
-  --surface2: #1a1d27;
-  --border: #22263a;
-  --accent: #4f8ef7;
-  --accent2: #38d9a9;
-  --warn: #f59e0b;
-  --danger: #f87171;
-  --text: #e8eaf0;
-  --muted: #6b7280;
-  --mono: 'IBM Plex Mono', monospace;
-  --sans: 'IBM Plex Sans', sans-serif;
-}
+:root{--bg:#0a0c10;--surface:#13151f;--surface2:#1a1d27;--border:#22263a;--accent:#4f8ef7;--accent2:#38d9a9;--warn:#f59e0b;--danger:#f87171;--text:#e8eaf0;--muted:#6b7280;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
-
-.grid-bg{position:fixed;inset:0;z-index:0;
-  background-image:linear-gradient(rgba(79,142,247,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(79,142,247,0.04) 1px,transparent 1px);
-  background-size:32px 32px;pointer-events:none}
-
-.layout{position:relative;z-index:1;display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+.grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(79,142,247,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(79,142,247,0.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.layout{position:relative;z-index:1;display:grid;grid-template-columns:260px 1fr;min-height:100vh}
 
 /* SIDEBAR */
-.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.5rem;display:flex;flex-direction:column;gap:1rem}
-.logo{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase}
-.logo-sub{font-size:12px;color:var(--muted);margin-top:2px}
-
-.stats-col{display:flex;flex-direction:column;gap:8px}
-.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
-.stat-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px}
-.stat-val{font-size:26px;font-weight:600;color:var(--text)}
-.stat-val.green{color:var(--accent2)}
-.stat-val.blue{color:var(--accent)}
-.stat-val.warn{color:var(--warn)}
-
-.session-controls{display:flex;flex-direction:column;gap:8px;margin-top:auto}
-.btn{border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:opacity 0.2s,transform 0.1s}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.25rem;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.brand{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase}
+.brand-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.instructor-badge{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.ib-label{font-size:11px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px}
+.ib-name{font-size:14px;font-weight:500}
+.ib-role{font-size:11px;color:var(--muted)}
+.stats-col{display:flex;flex-direction:column;gap:7px}
+.stat{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.stat-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px}
+.stat-val{font-size:22px;font-weight:600}
+.green{color:var(--accent2)} .blue{color:var(--accent)} .warn{color:var(--warn)} .red{color:var(--danger)}
+.timer-el{font-family:var(--mono);font-size:26px;font-weight:500;color:var(--accent);text-align:center;padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)}
+.sidebar-actions{display:flex;flex-direction:column;gap:7px;margin-top:auto}
+.btn{border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:opacity 0.2s,transform 0.1s;width:100%;text-align:center}
 .btn:active{transform:scale(0.98)}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{opacity:0.9}
+.btn-success{background:var(--accent2);color:#0a0c10}
 .btn-danger{background:var(--danger);color:#fff}
-.btn-danger:hover{opacity:0.9}
 .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-.btn-outline:hover{background:var(--surface2)}
+.btn:hover{opacity:0.88}
 .btn:disabled{opacity:0.4;cursor:not-allowed}
 
-.timer-display{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--accent);text-align:center;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)}
-
 /* MAIN */
-.main{padding:1.5rem;overflow-y:auto}
-.main-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:8px}
+.main{overflow-y:auto;padding:1.5rem}
+.main-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:8px}
 .main-title{font-size:18px;font-weight:600}
-.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(56,217,169,0.1);border:1px solid var(--accent2);color:var(--accent2);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:12px}
+.session-info{font-size:12px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(56,217,169,0.1);border:1px solid var(--accent2);color:var(--accent2);border-radius:6px;padding:3px 10px;font-family:var(--mono);font-size:11px}
 .live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);animation:pulse 1.5s infinite}
-
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-
-.teams-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-
-.team-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;transition:border-color 0.3s}
-.team-card.all-done{border-color:var(--accent2)}
-.team-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
-.team-name{font-size:15px;font-weight:500}
-.topic-chip{font-size:10px;padding:3px 8px;border-radius:5px;background:rgba(79,142,247,0.15);color:var(--accent);font-family:var(--mono);max-width:140px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap}
-
-.members-list{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
-.member-row{display:flex;align-items:center;gap:8px}
-.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background 0.5s}
-.status-dot.online{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,0.5)}
-.status-dot.idle{background:var(--warn)}
-.status-dot.offline{background:#374151}
-.member-name-text{font-size:13px;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.member-meta{font-size:11px;color:var(--muted);font-family:var(--mono);white-space:nowrap}
-.member-meta .done{color:var(--accent2)}
-
-.prog-track{height:3px;background:var(--border);border-radius:2px;margin-bottom:10px}
+.code-display{display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-family:var(--mono);font-size:13px}
+.code-val{color:var(--accent);font-size:16px;font-weight:500;letter-spacing:0.12em}
+.copy-btn{font-size:11px;color:var(--muted);cursor:pointer;border:1px solid var(--border);background:transparent;border-radius:4px;padding:2px 6px;font-family:var(--mono)}
+.copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+.teams-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.team-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;transition:border-color 0.3s}
+.team-card.done{border-color:var(--accent2)}
+.team-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.team-name{font-size:14px;font-weight:500}
+.topic-chip{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.15);color:var(--accent);font-family:var(--mono);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.member-row{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:background 0.5s}
+.sdot.online{background:#22c55e;box-shadow:0 0 5px rgba(34,197,94,0.5)}
+.sdot.idle{background:var(--warn)}
+.sdot.offline{background:#374151}
+.mname{font-size:12px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mmeta{font-size:10px;color:var(--muted);font-family:var(--mono);white-space:nowrap}
+.mmeta .ok{color:var(--accent2)}
+.prog-track{height:3px;background:var(--border);border-radius:2px;margin:10px 0}
 .prog-fill{height:100%;border-radius:2px;background:var(--accent2);transition:width 0.6s}
+.card-foot{display:flex;align-items:center;justify-content:space-between}
+.foot-tag{font-size:11px;font-family:var(--mono);color:var(--muted)}
+.foot-tag.ok{color:var(--accent2)}
+.mcq-pill{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.1);color:var(--accent);font-family:var(--mono)}
 
-.card-footer{display:flex;align-items:center;justify-content:space-between}
-.footer-tag{font-size:11px;font-family:var(--mono);color:var(--muted)}
-.footer-tag.done{color:var(--accent2)}
-.mcq-pill{font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(79,142,247,0.1);color:var(--accent);font-family:var(--mono)}
-
-/* Setup panel */
-.setup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem}
-.setup-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:700px;max-height:90vh;overflow-y:auto}
-.setup-title{font-size:18px;font-weight:500;margin-bottom:1.5rem}
-.field{margin-bottom:14px}
-.field label{font-size:13px;color:var(--muted);font-family:var(--mono);display:block;margin-bottom:5px}
-.field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--sans);outline:none}
+/* OVERLAYS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:680px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:17px;font-weight:600;margin-bottom:1.25rem}
+.field{margin-bottom:13px}
+.field label{font-size:11px;color:var(--muted);font-family:var(--mono);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em}
+.field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--sans);outline:none;transition:border-color 0.2s}
 .field input:focus,.field textarea:focus{border-color:var(--accent)}
-.field textarea{resize:vertical;min-height:200px;font-size:13px;line-height:1.6}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field textarea{resize:vertical;min-height:160px;line-height:1.6}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn-row{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
+.btn-row .btn{width:auto;flex:1}
+.err{font-size:12px;color:var(--danger);margin-top:6px;display:none}
+
+/* LOGIN */
+.login-wrap{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem}
+.login-box{width:100%;max-width:380px}
+.login-brand{text-align:center;margin-bottom:1.75rem}
+.login-brand-name{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase}
+.login-brand-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:2rem}
+.login-title{font-size:17px;font-weight:600;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+
+/* SESSIONS LIST */
+.sessions-list{display:flex;flex-direction:column;gap:10px}
+.session-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;cursor:pointer;transition:border-color 0.2s}
+.session-item:hover{border-color:var(--accent)}
+.session-item.active-session{border-color:var(--accent2)}
+.si-left .si-name{font-size:14px;font-weight:500}
+.si-left .si-meta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+.si-right{display:flex;align-items:center;gap:8px}
+.si-code{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:0.1em}
+.si-active{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(56,217,169,0.1);color:var(--accent2);border:1px solid rgba(56,217,169,0.2)}
+.si-ended{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(107,114,128,0.1);color:var(--muted);border:1px solid rgba(107,114,128,0.2)}
+.empty-state{text-align:center;padding:3rem;color:var(--muted);font-size:13px;font-family:var(--mono)}
+
+/* Summary viewer */
+.sub-modal{max-width:560px}
+.sub-text{font-size:13px;line-height:1.8;color:#b0b8c8;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;max-height:200px;overflow-y:auto}
+
 .hidden{display:none!important}
 
-/* Submission viewer */
-.sub-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem}
-.sub-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:600px;max-height:85vh;overflow-y:auto}
-.sub-title{font-size:16px;font-weight:500;margin-bottom:8px}
-.sub-meta{font-size:12px;color:var(--muted);margin-bottom:1rem;font-family:var(--mono)}
-.sub-text{font-size:14px;line-height:1.8;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px}
+/* Past sessions view */
+.view-toggle{display:flex;gap:6px;margin-bottom:1rem}
+.vt-btn{background:transparent;border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:var(--mono)}
+.vt-btn.active{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
 <div class="grid-bg"></div>
 
-<div class="layout">
-  <!-- SIDEBAR -->
+<!-- LOGIN -->
+<div id="screen-login" class="login-wrap">
+  <div class="login-box">
+    <div class="login-brand">
+      <div class="login-brand-name">SO Online Sessions</div>
+      <div class="login-brand-sub">Instructor dashboard</div>
+    </div>
+    <div class="login-card">
+      <div class="login-title">Sign in</div>
+      <div class="login-sub">Enter your instructor credentials</div>
+      <div class="field"><label>Username</label><input id="login-user" placeholder="e.g. surayya" /></div>
+      <div class="field"><label>Password</label><input id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" /></div>
+      <div id="login-err" class="err">Invalid username or password.</div>
+      <button class="btn btn-primary" style="margin-top:4px" onclick="doLogin()">Sign in →</button>
+      <div style="margin-top:1rem;font-size:11px;color:var(--muted);font-family:var(--mono);text-align:center">
+        New instructor account? Ask admin to add you in Firebase.<br>
+        Default: username = <span style="color:var(--accent)">surayya</span> / password = <span style="color:var(--accent)">dbms2024</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div id="screen-monitor" class="layout hidden">
   <div class="sidebar">
     <div>
-      <div class="logo">DBMS Monitor</div>
-      <div class="logo-sub">Teacher dashboard</div>
+      <div class="brand">SO Online Sessions</div>
+      <div class="brand-sub">Instructor dashboard</div>
     </div>
-
-    <div class="timer-display" id="timer-el">00:00</div>
-
+    <div class="instructor-badge">
+      <div class="ib-label">Logged in as</div>
+      <div class="ib-name" id="ib-name">—</div>
+      <div class="ib-role" id="ib-role">—</div>
+    </div>
+    <div class="timer-el" id="timer-el">—</div>
     <div class="stats-col">
-      <div class="stat-card"><div class="stat-label">Total teams</div><div class="stat-val blue" id="s-teams">—</div></div>
-      <div class="stat-card"><div class="stat-label">Online now</div><div class="stat-val green" id="s-online">—</div></div>
-      <div class="stat-card"><div class="stat-label">Summaries in</div><div class="stat-val" id="s-summaries">—</div></div>
-      <div class="stat-card"><div class="stat-label">Avg MCQ score</div><div class="stat-val warn" id="s-mcq">—</div></div>
+      <div class="stat"><div class="stat-label">Teams</div><div class="stat-val blue" id="s-teams">—</div></div>
+      <div class="stat"><div class="stat-label">Online</div><div class="stat-val green" id="s-online">—</div></div>
+      <div class="stat"><div class="stat-label">Summaries</div><div class="stat-val" id="s-subs">—</div></div>
+      <div class="stat"><div class="stat-label">Avg MCQ</div><div class="stat-val warn" id="s-mcq">—</div></div>
     </div>
-
-    <div class="session-controls">
-      <button class="btn btn-outline" onclick="showSetup()">Setup / Load teams</button>
-      <button class="btn btn-primary" onclick="startSession()" id="start-btn">Start session</button>
+    <div class="sidebar-actions">
+      <button class="btn btn-outline" onclick="showSessions()">My sessions</button>
+      <button class="btn btn-success" onclick="showNewSession()">+ New session</button>
+      <button class="btn btn-primary hidden" onclick="startSession()" id="start-btn">Start session</button>
       <button class="btn btn-danger hidden" onclick="endSession()" id="end-btn">End session</button>
+      <button class="btn btn-outline" onclick="logout()" style="margin-top:4px;font-size:12px;color:var(--muted)">Sign out</button>
     </div>
   </div>
 
-  <!-- MAIN -->
   <div class="main">
-    <div class="main-header">
-      <div class="main-title">Live class monitor</div>
-      <div id="live-badge" class="live-badge hidden"><div class="live-dot"></div>LIVE</div>
+    <div class="main-top">
+      <div>
+        <div class="main-title" id="main-title">Live class monitor</div>
+        <div class="session-info" id="session-info">No active session</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div id="code-display" class="code-display hidden">
+          Code: <span class="code-val" id="code-val">—</span>
+          <button class="copy-btn" onclick="copyCode()">copy</button>
+        </div>
+        <div id="live-badge" class="live-badge hidden"><div class="live-dot"></div>LIVE</div>
+      </div>
     </div>
 
-    <div id="no-session" style="text-align:center;padding:4rem;color:var(--muted)">
-      <div style="font-family:var(--mono);font-size:13px;margin-bottom:8px">No session active</div>
-      <div style="font-size:13px">Use Setup to load teams, then Start Session</div>
-    </div>
-
+    <div id="empty-state" class="empty-state">No session loaded.<br>Create a new session or pick one from My Sessions.</div>
     <div id="teams-grid" class="teams-grid hidden"></div>
   </div>
 </div>
 
-<!-- SETUP OVERLAY -->
-<div class="setup-overlay hidden" id="setup-overlay">
-  <div class="setup-box">
-    <div class="setup-title">Setup — Teams & Topics</div>
+<!-- NEW SESSION MODAL -->
+<div class="overlay hidden" id="new-session-modal">
+  <div class="modal">
+    <div class="modal-title">Create new session</div>
     <div class="two-col">
-      <div class="field">
-        <label>Student names (one per line)</label>
-        <textarea id="names-input" placeholder="Ahmed Khan&#10;Sara Malik&#10;..."></textarea>
-      </div>
       <div>
-        <div class="field">
-          <label>Team size</label>
-          <select id="team-size-sel">
+        <div class="field"><label>Class name</label><input id="ns-class" placeholder="e.g. SE-2" /></div>
+        <div class="field"><label>Subject</label><input id="ns-subject" placeholder="e.g. DBMS" /></div>
+        <div class="field"><label>Duration (minutes)</label><input id="ns-duration" type="number" value="40" min="10" max="180" /></div>
+        <div class="field"><label>Team size</label>
+          <select id="ns-teamsize">
             <option value="2">2 per team</option>
             <option value="3" selected>3 per team</option>
             <option value="4">4 per team</option>
           </select>
         </div>
-        <div class="field">
-          <label>Topics (one per line)</label>
-          <textarea id="topics-input" rows="12">Introduction to Database Systems
-Issues in Traditional File Storage Systems
-Advantages of DBMS
-Evolution of DBMS
-SDLC Approach for DBMS
-Rapid Prototyping for DBMS
-ANSI SPARC Model and Data Independence
-Schema and Schema Modelling
-Introduction to ER Modelling
-Constructs of ER
-Attributes and Their Types
-Entity and Entity Types
-Relationships
-Associative Entities
-Degree of Relationships
-Cardinalities in Relationships
-Enhanced ER with Supertype Subtype Modelling
-Completeness, Dis-jointness, Subtype Discriminators
-Relational Keys
-Relational Integrity
-Relational Model
-Transforming ER to Relational Model</textarea>
-        </div>
+      </div>
+      <div>
+        <div class="field"><label>Student names (one per line)</label><textarea id="ns-names" placeholder="Ahmed Khan&#10;Sara Malik&#10;..."></textarea></div>
       </div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:1rem">
-      <button class="btn btn-primary" onclick="generateTeams()">Generate teams randomly</button>
-      <button class="btn btn-outline" onclick="closeSetup()">Cancel</button>
+    <div class="field"><label>Topics (one per line)</label><textarea id="ns-topics" rows="6" placeholder="Introduction to Database Systems&#10;ER Modelling&#10;..."></textarea></div>
+    <div id="ns-err" class="err">Please fill all fields.</div>
+    <div class="btn-row">
+      <button class="btn btn-success" onclick="createSession()">Generate teams & create</button>
+      <button class="btn btn-outline" onclick="closeModal('new-session-modal')">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- SUBMISSION VIEWER -->
-<div class="sub-overlay hidden" id="sub-overlay">
-  <div class="sub-box">
-    <div class="sub-title" id="sub-name">—</div>
-    <div class="sub-meta" id="sub-meta">—</div>
-    <div class="sub-text" id="sub-text">—</div>
-    <div style="margin-top:1rem">
-      <button class="btn btn-outline" onclick="closeSubView()">Close</button>
+<!-- SESSIONS LIST MODAL -->
+<div class="overlay hidden" id="sessions-modal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title">My sessions</div>
+    <div class="view-toggle">
+      <button class="vt-btn active" onclick="filterSessions('all',this)">All</button>
+      <button class="vt-btn" onclick="filterSessions('active',this)">Active</button>
+      <button class="vt-btn" onclick="filterSessions('ended',this)">Ended</button>
     </div>
+    <div class="sessions-list" id="sessions-list"><div class="empty-state">Loading...</div></div>
+    <div class="btn-row" style="margin-top:1rem">
+      <button class="btn btn-outline" onclick="closeModal('sessions-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUMMARY VIEWER -->
+<div class="overlay hidden" id="sub-modal">
+  <div class="modal sub-modal">
+    <div class="modal-title" id="sub-student-name">—</div>
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:12px" id="sub-meta">—</div>
+    <div class="sub-text" id="sub-text">—</div>
+    <div class="btn-row"><button class="btn btn-outline" onclick="closeModal('sub-modal')">Close</button></div>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ── PASTE YOUR FIREBASE CONFIG BELOW ──
 const firebaseConfig = {
   apiKey: "AIzaSyBgYtUIOeWntYEgEcAH93PBHGjEfrrZdTg",
   authDomain: "so-online-classes.firebaseapp.com",
@@ -230,203 +259,305 @@ const firebaseConfig = {
   messagingSenderId: "763914223805",
   appId: "1:763914223805:web:24c5492eb64390331cb7d4"
 };
-// ─────────────────────────────────────
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let teams = [];
-let presenceData = {};
-let sessionActive = false;
-let sessionStart = null;
-let timerInterval = null;
+// Built-in instructor accounts (add more here or manage via Firebase)
+const INSTRUCTORS = {
+  "surayya": { password: "dbms2024", name: "Surayya binte Obaida", role: "Lecturer — SE dept" },
+  "admin":   { password: "admin123", name: "Admin", role: "Administrator" }
+};
 
-const OFFLINE_MS = 15 * 60 * 1000;
-const IDLE_MS = 5 * 60 * 1000;
+let currentUser = null, currentSession = null, currentCode = null;
+let presenceUnsub = null, timerInterval = null;
+let allSessions = [], sessionFilter = 'all';
 
+const OFFLINE_MS = 15 * 60 * 1000, IDLE_MS = 5 * 60 * 1000;
 function getStatus(lastSeen) {
   if (!lastSeen) return 'offline';
   const ago = Date.now() - lastSeen;
-  if (ago > OFFLINE_MS) return 'offline';
-  if (ago > IDLE_MS) return 'idle';
-  return 'online';
+  return ago > OFFLINE_MS ? 'offline' : ago > IDLE_MS ? 'idle' : 'online';
 }
 
-// Load existing session on page load
-async function init() {
-  const snap = await getDoc(doc(db, 'session', 'config'));
-  if (snap.exists()) {
-    const data = snap.data();
-    teams = data.teams || [];
-    if (data.active) {
-      sessionActive = true;
-      sessionStart = data.startTime;
-      document.getElementById('start-btn').disabled = true;
-      document.getElementById('end-btn').classList.remove('hidden');
-      document.getElementById('live-badge').classList.remove('hidden');
-      document.getElementById('no-session').classList.add('hidden');
-      document.getElementById('teams-grid').classList.remove('hidden');
-      startTimer();
-    }
-    if (teams.length > 0) renderTeams();
+// ── LOGIN ──
+window.doLogin = async function() {
+  const u = document.getElementById('login-user').value.trim().toLowerCase();
+  const p = document.getElementById('login-pass').value;
+  if (INSTRUCTORS[u] && INSTRUCTORS[u].password === p) {
+    currentUser = { username: u, ...INSTRUCTORS[u] };
+    document.getElementById('ib-name').textContent = currentUser.name;
+    document.getElementById('ib-role').textContent = currentUser.role;
+    document.getElementById('screen-login').classList.add('hidden');
+    document.getElementById('screen-monitor').classList.remove('hidden');
+    await loadActiveSession();
+  } else {
+    // Also try Firebase instructors collection
+    try {
+      const snap = await getDoc(doc(db, 'instructors', u));
+      if (snap.exists() && snap.data().password === p) {
+        currentUser = { username: u, name: snap.data().name, role: snap.data().role || 'Instructor' };
+        document.getElementById('ib-name').textContent = currentUser.name;
+        document.getElementById('ib-role').textContent = currentUser.role;
+        document.getElementById('screen-login').classList.add('hidden');
+        document.getElementById('screen-monitor').classList.remove('hidden');
+        await loadActiveSession();
+        return;
+      }
+    } catch(e) {}
+    document.getElementById('login-err').style.display = 'block';
   }
-  listenPresence();
 }
 
-function listenPresence() {
-  onSnapshot(collection(db, 'presence'), (snap) => {
-    snap.forEach(doc => { presenceData[doc.data().name] = doc.data(); });
-    if (teams.length > 0) renderTeams();
-    updateStats();
+window.logout = function() {
+  if (presenceUnsub) presenceUnsub();
+  clearInterval(timerInterval);
+  currentUser = null; currentSession = null; currentCode = null;
+  document.getElementById('screen-monitor').classList.add('hidden');
+  document.getElementById('screen-login').classList.remove('hidden');
+}
+
+async function loadActiveSession() {
+  // Find this instructor's active session
+  const snap = await getDoc(doc(db, 'instructors', currentUser.username, 'meta', 'activeSession'));
+  if (snap.exists() && snap.data().code) {
+    const code = snap.data().code;
+    const sSnap = await getDoc(doc(db, 'sessions', code));
+    if (sSnap.exists() && sSnap.data().active) {
+      loadSession(code, sSnap.data());
+    }
+  }
+}
+
+function loadSession(code, data) {
+  currentCode = code;
+  currentSession = data;
+  document.getElementById('main-title').textContent = `${data.subject} — ${data.className}`;
+  document.getElementById('session-info').textContent = `Code: ${code} · ${data.teams?.length || 0} teams · ${new Date(data.createdAt).toLocaleDateString()}`;
+  document.getElementById('code-val').textContent = code;
+  document.getElementById('code-display').classList.remove('hidden');
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('teams-grid').classList.remove('hidden');
+  document.getElementById('s-teams').textContent = data.teams?.length || 0;
+
+  if (data.active) {
+    document.getElementById('live-badge').classList.remove('hidden');
+    document.getElementById('start-btn').classList.add('hidden');
+    document.getElementById('end-btn').classList.remove('hidden');
+    if (data.startTime) startTimer(data.startTime, data.durationMinutes || 40);
+  } else {
+    document.getElementById('live-badge').classList.add('hidden');
+    document.getElementById('start-btn').classList.remove('hidden');
+    document.getElementById('end-btn').classList.add('hidden');
+    document.getElementById('timer-el').textContent = `${data.durationMinutes || 40}:00`;
+  }
+
+  if (presenceUnsub) presenceUnsub();
+  presenceUnsub = onSnapshot(collection(db, 'sessions', code, 'presence'), snap => {
+    const presence = {};
+    snap.forEach(d => { presence[d.data().name] = d.data(); });
+    renderTeams(data.teams || [], presence);
+    updateStats(data.teams || [], presence);
   });
 }
 
-window.showSetup = function() {
-  document.getElementById('setup-overlay').classList.remove('hidden');
-}
-window.closeSetup = function() {
-  document.getElementById('setup-overlay').classList.add('hidden');
-}
-
-function shuffle(arr) {
-  const a = [...arr];
-  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
-  return a;
-}
-
-window.generateTeams = async function() {
-  const names = document.getElementById('names-input').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
-  const topics = document.getElementById('topics-input').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
-  const size = parseInt(document.getElementById('team-size-sel').value);
-  if (names.length < 2) { alert('Add student names'); return; }
-  const shuffled = shuffle(names);
-  teams = [];
-  let tIdx = 0;
-  for(let i=0;i<shuffled.length;i+=size){
-    teams.push({
-      name: `Team ${tIdx+1}`,
-      topic: topics[tIdx % topics.length],
-      members: shuffled.slice(i,i+size)
-    });
-    tIdx++;
-  }
-  await setDoc(doc(db, 'session', 'config'), { teams, active: false, startTime: null });
-  renderTeams();
-  updateStats();
-  document.getElementById('no-session').classList.add('hidden');
-  document.getElementById('teams-grid').classList.remove('hidden');
-  closeSetup();
-}
-
-window.startSession = async function() {
-  if(teams.length===0){alert('Set up teams first');return;}
-  sessionStart = Date.now();
-  sessionActive = true;
-  await setDoc(doc(db, 'session', 'config'), { teams, active: true, startTime: sessionStart }, { merge: true });
-  document.getElementById('start-btn').disabled = true;
-  document.getElementById('end-btn').classList.remove('hidden');
-  document.getElementById('live-badge').classList.remove('hidden');
-  startTimer();
-}
-
-window.endSession = async function() {
-  if(!confirm('End the session?')) return;
-  sessionActive = false;
-  await setDoc(doc(db,'session','config'),{active:false},{merge:true});
-  clearInterval(timerInterval);
-  document.getElementById('start-btn').disabled = false;
-  document.getElementById('end-btn').classList.add('hidden');
-  document.getElementById('live-badge').classList.add('hidden');
-}
-
-function startTimer() {
-  timerInterval = setInterval(() => {
-    if(!sessionStart) return;
-    const elapsed = Math.floor((Date.now()-sessionStart)/1000);
-    const left = Math.max(0, 40*60 - elapsed);
-    const m = Math.floor(left/60);
-    const s = left%60;
-    document.getElementById('timer-el').textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-    if(left===0){clearInterval(timerInterval);document.getElementById('timer-el').style.color='var(--danger)';}
-  }, 1000);
-}
-
-function renderTeams() {
+function renderTeams(teams, presence) {
   const grid = document.getElementById('teams-grid');
   grid.innerHTML = '';
   teams.forEach(team => {
     const members = team.members.map(name => {
-      const p = presenceData[name];
-      const status = p ? getStatus(p.lastSeen) : 'offline';
-      const mcqAns = p ? (p.mcqAnswered || 0) : 0;
-      const mcqScore = p ? (p.mcqScore || 0) : 0;
-      const summary = p ? (p.summarySubmitted || false) : false;
-      return { name, status, mcqAns, mcqScore, summary };
+      const p = presence[name] || {};
+      return { name, status: getStatus(p.lastSeen), mcqScore: p.mcqScore || 0, mcqAnswered: p.mcqAnswered || 0, summary: p.summarySubmitted || false, summaryText: p.summaryText || '', submittedAt: p.submittedAt };
     });
-
-    const online = members.filter(m=>m.status==='online').length;
-    const totalMcq = members.reduce((a,m)=>a+m.mcqScore,0);
-    const anySummary = members.some(m=>m.summary);
-    const allDone = members.every(m=>m.summary && m.mcqAns>=5);
-    const progress = Math.round((members.filter(m=>m.status!=='offline').length/members.length)*50 + (allDone?50:anySummary?25:0));
+    const online = members.filter(m => m.status === 'online').length;
+    const avgMcq = members.length ? (members.reduce((a,m)=>a+m.mcqScore,0)/members.length).toFixed(1) : 0;
+    const allDone = members.every(m => m.summary && m.mcqAnswered >= 5);
+    const prog = Math.round((members.filter(m=>m.status!=='offline').length/members.length)*50 + (allDone?50:members.some(m=>m.summary)?25:0));
 
     const card = document.createElement('div');
-    card.className = `team-card${allDone?' all-done':''}`;
+    card.className = `team-card${allDone?' done':''}`;
     card.innerHTML = `
       <div class="team-top">
         <div class="team-name">${team.name}</div>
         <div class="topic-chip" title="${team.topic}">${team.topic}</div>
       </div>
-      <div class="members-list">
-        ${members.map(m=>`
-          <div class="member-row">
-            <div class="status-dot ${m.status}"></div>
-            <span class="member-name-text">${m.name}</span>
-            <span class="member-meta">
-              <span class="${m.summary?'done':''}">${m.mcqAns}/5 MCQ</span>
-              ${m.summary?'<span class="done"> ✓</span>':''}
-              ${m.summary?`<span style="cursor:pointer;color:var(--accent);margin-left:4px" onclick="viewSummary('${m.name.replace(/'/g,"\\'")}')"> view</span>`:''}
-            </span>
-          </div>`).join('')}
-      </div>
-      <div class="prog-track"><div class="prog-fill" style="width:${progress}%"></div></div>
-      <div class="card-footer">
-        <span class="footer-tag ${allDone?'done':''}">${allDone?'✓ all done':online>0?`${online} online`:'offline'}</span>
-        <span class="mcq-pill">avg ${members.length>0?(totalMcq/members.length).toFixed(1):0}/5</span>
+      ${members.map(m => `
+        <div class="member-row">
+          <div class="sdot ${m.status}"></div>
+          <span class="mname">${m.name}</span>
+          <span class="mmeta">
+            <span class="${m.mcqAnswered>=5?'ok':''}">${m.mcqScore}/5</span>
+            ${m.summary?`<span class="ok"> ✓</span> <span style="cursor:pointer;color:var(--accent)" onclick="viewSub('${m.name.replace(/'/g,"\\'")}','${team.topic}',${m.submittedAt||0})">view</span>`:''}
+          </span>
+        </div>`).join('')}
+      <div class="prog-track"><div class="prog-fill" style="width:${prog}%"></div></div>
+      <div class="card-foot">
+        <span class="foot-tag ${allDone?'ok':''}">${allDone?'✓ all done':online>0?`${online} online`:'offline'}</span>
+        <span class="mcq-pill">avg ${avgMcq}/5</span>
       </div>`;
     grid.appendChild(card);
   });
 }
 
-function updateStats() {
-  document.getElementById('s-teams').textContent = teams.length;
-  const onlineCount = Object.values(presenceData).filter(p=>getStatus(p.lastSeen)==='online').length;
-  document.getElementById('s-online').textContent = onlineCount;
-  const submittedCount = Object.values(presenceData).filter(p=>p.summarySubmitted).length;
-  document.getElementById('s-summaries').textContent = submittedCount;
-  const allScores = Object.values(presenceData).filter(p=>p.mcqAnswered>0);
-  const avgMcq = allScores.length>0?(allScores.reduce((a,p)=>a+(p.mcqScore||0),0)/allScores.length).toFixed(1):'—';
-  document.getElementById('s-mcq').textContent = avgMcq;
+function updateStats(teams, presence) {
+  const allMembers = teams.flatMap(t => t.members);
+  const online = Object.values(presence).filter(p => getStatus(p.lastSeen) === 'online').length;
+  const subs = Object.values(presence).filter(p => p.summarySubmitted).length;
+  const scores = Object.values(presence).filter(p => p.mcqAnswered > 0);
+  const avg = scores.length ? (scores.reduce((a,p)=>a+(p.mcqScore||0),0)/scores.length).toFixed(1) : '—';
+  document.getElementById('s-online').textContent = online;
+  document.getElementById('s-subs').textContent = subs;
+  document.getElementById('s-mcq').textContent = avg;
 }
 
-window.viewSummary = async function(name) {
+function startTimer(startTime, dur) {
+  clearInterval(timerInterval);
+  const tick = () => {
+    const left = Math.max(0, dur * 60 - Math.floor((Date.now() - startTime) / 1000));
+    const m = String(Math.floor(left/60)).padStart(2,'0');
+    const s = String(left%60).padStart(2,'0');
+    document.getElementById('timer-el').textContent = `${m}:${s}`;
+    if (left === 0) { clearInterval(timerInterval); document.getElementById('timer-el').style.color = 'var(--danger)'; }
+  };
+  tick();
+  timerInterval = setInterval(tick, 1000);
+}
+
+// ── NEW SESSION ──
+window.showNewSession = function() { document.getElementById('new-session-modal').classList.remove('hidden'); }
+
+function shuffle(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+function genCode(subject, className) {
+  const s = (subject||'XX').replace(/[^A-Z0-9]/gi,'').toUpperCase().slice(0,4);
+  const n = Math.floor(10+Math.random()*89);
+  return s + n;
+}
+
+window.createSession = async function() {
+  const className = document.getElementById('ns-class').value.trim();
+  const subject = document.getElementById('ns-subject').value.trim();
+  const duration = parseInt(document.getElementById('ns-duration').value) || 40;
+  const size = parseInt(document.getElementById('ns-teamsize').value);
+  const names = document.getElementById('ns-names').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
+  const topics = document.getElementById('ns-topics').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
+
+  if (!className || !subject || names.length < 2 || topics.length < 1) {
+    document.getElementById('ns-err').style.display = 'block'; return;
+  }
+  document.getElementById('ns-err').style.display = 'none';
+
+  const shuffled = shuffle(names);
+  const teams = [];
+  let ti = 0;
+  for (let i = 0; i < shuffled.length; i += size) {
+    teams.push({ name: `Team ${ti+1}`, topic: topics[ti % topics.length], members: shuffled.slice(i, i+size) });
+    ti++;
+  }
+
+  const code = genCode(subject, className);
+  const sessionData = {
+    code, className, subject, durationMinutes: duration,
+    instructorUsername: currentUser.username,
+    instructorName: currentUser.name,
+    teams, active: false,
+    createdAt: Date.now(), startTime: null
+  };
+
+  await setDoc(doc(db, 'sessions', code), sessionData);
+  await setDoc(doc(db, 'instructors', currentUser.username, 'meta', 'sessions'), { codes: [] }, { merge: true });
+
+  closeModal('new-session-modal');
+  loadSession(code, sessionData);
+  document.getElementById('start-btn').classList.remove('hidden');
+}
+
+// ── START / END ──
+window.startSession = async function() {
+  if (!currentCode) return;
+  const startTime = Date.now();
+  await setDoc(doc(db, 'sessions', currentCode), { active: true, startTime }, { merge: true });
+  await setDoc(doc(db, 'instructors', currentUser.username, 'meta', 'activeSession'), { code: currentCode });
+  currentSession.active = true; currentSession.startTime = startTime;
+  document.getElementById('live-badge').classList.remove('hidden');
+  document.getElementById('start-btn').classList.add('hidden');
+  document.getElementById('end-btn').classList.remove('hidden');
+  startTimer(startTime, currentSession.durationMinutes || 40);
+}
+
+window.endSession = async function() {
+  if (!confirm('End session? Students will be disconnected.')) return;
+  await setDoc(doc(db, 'sessions', currentCode), { active: false, endedAt: Date.now() }, { merge: true });
+  await setDoc(doc(db, 'instructors', currentUser.username, 'meta', 'activeSession'), { code: null });
+  clearInterval(timerInterval);
+  document.getElementById('live-badge').classList.add('hidden');
+  document.getElementById('end-btn').classList.add('hidden');
+  document.getElementById('start-btn').classList.remove('hidden');
+  document.getElementById('timer-el').style.color = 'var(--accent)';
+  window.open(`summary.html?code=${currentCode}`, '_blank');
+}
+
+// ── SESSIONS LIST ──
+window.showSessions = async function() {
+  document.getElementById('sessions-modal').classList.remove('hidden');
+  document.getElementById('sessions-list').innerHTML = '<div class="empty-state">Loading...</div>';
+  const snap = await getDocs(collection(db, 'sessions'));
+  allSessions = [];
+  snap.forEach(d => { if (d.data().instructorUsername === currentUser.username) allSessions.push(d.data()); });
+  allSessions.sort((a,b) => b.createdAt - a.createdAt);
+  renderSessionsList();
+}
+
+function renderSessionsList() {
+  const list = document.getElementById('sessions-list');
+  let filtered = allSessions;
+  if (sessionFilter === 'active') filtered = allSessions.filter(s => s.active);
+  if (sessionFilter === 'ended') filtered = allSessions.filter(s => !s.active);
+  if (!filtered.length) { list.innerHTML = '<div class="empty-state">No sessions found.</div>'; return; }
+  list.innerHTML = '';
+  filtered.forEach(s => {
+    const d = document.createElement('div');
+    d.className = `session-item${s.active?' active-session':''}`;
+    d.innerHTML = `
+      <div class="si-left">
+        <div class="si-name">${s.subject} — ${s.className}</div>
+        <div class="si-meta">${new Date(s.createdAt).toLocaleDateString()} · ${s.teams?.length||0} teams · ${s.durationMinutes||40}min</div>
+      </div>
+      <div class="si-right">
+        <span class="si-code">${s.code}</span>
+        <span class="${s.active?'si-active':'si-ended'}">${s.active?'LIVE':'ended'}</span>
+      </div>`;
+    d.onclick = () => { loadSession(s.code, s); closeModal('sessions-modal'); };
+    list.appendChild(d);
+  });
+}
+
+window.filterSessions = function(f, btn) {
+  sessionFilter = f;
+  document.querySelectorAll('.vt-btn').forEach(b => b.classList.toggle('active', b === btn));
+  renderSessionsList();
+}
+
+// ── SUMMARY VIEWER ──
+window.viewSub = async function(name, topic, submittedAt) {
   const key = name.replace(/\s+/g,'_');
-  const snap = await getDoc(doc(db,'presence',key));
-  if(!snap.exists()) return;
-  const data = snap.data();
-  document.getElementById('sub-name').textContent = name;
-  const team = teams.find(t=>t.members.includes(name));
-  document.getElementById('sub-meta').textContent = (team?team.topic+' · ':'')+
-    (data.submittedAt?new Date(data.submittedAt).toLocaleTimeString():'');
-  document.getElementById('sub-text').textContent = data.summaryText || '(empty)';
-  document.getElementById('sub-overlay').classList.remove('hidden');
+  const snap = await getDoc(doc(db,'sessions',currentCode,'presence',key));
+  if (!snap.exists()) return;
+  document.getElementById('sub-student-name').textContent = name;
+  document.getElementById('sub-meta').textContent = topic + (submittedAt ? ` · ${new Date(submittedAt).toLocaleTimeString()}` : '');
+  document.getElementById('sub-text').textContent = snap.data().summaryText || '(empty)';
+  document.getElementById('sub-modal').classList.remove('hidden');
 }
 
-window.closeSubView = function() {
-  document.getElementById('sub-overlay').classList.add('hidden');
+window.copyCode = function() {
+  navigator.clipboard.writeText(currentCode).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'copied!';
+    setTimeout(() => btn.textContent = 'copy', 1500);
+  });
 }
 
-init();
+window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); }
 </script>
 </body>
 </html>
